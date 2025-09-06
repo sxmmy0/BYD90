@@ -16,3 +16,5 @@ const RecommendationsPage = () => {
     </>
   )
 }
+
+export default RecommendationsPage
