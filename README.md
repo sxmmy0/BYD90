@@ -268,7 +268,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 For support and questions:
-- 📧 Email: support@byd90.com
+- 📧 Email: samuel.obembe@byd90.com
 - 💬 Discord: [BYD90 Community](https://discord.gg/byd90)
 - 📖 Documentation: [docs.byd90.com](https://docs.byd90.com)
 
