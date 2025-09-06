@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15
+    container_name: byd90_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: byd90_db
+      POSTGRES_USER: byd90_user
+      POSTGRES_PASSWORD: byd90_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - byd90_network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: byd90_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - byd90_network
+
+  # Backend API
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile.backend
+    container_name: byd90_backend
+    restart: unless-stopped
+    environment:
+      - POSTGRES_SERVER=db
+      - POSTGRES_USER=byd90_user
+      - POSTGRES_PASSWORD=byd90_password
+      - POSTGRES_DB=byd90_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ../backend:/app
+      - /app/__pycache__
+    networks:
+      - byd90_network
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Frontend
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: byd90_frontend
+    restart: unless-stopped
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    networks:
+      - byd90_network
+    command: npm run dev
+
+  # pgAdmin (Database Management)
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: byd90_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@byd90.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+    networks:
+      - byd90_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  byd90_network:
+    driver: bridge
