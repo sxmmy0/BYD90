@@ -320,7 +320,9 @@ frontend/build/
 *.pkl
 *.h5
 *.pb
-models/
+ml_models/
+ai_models/
+trained_models/
 
 # SSL Certificates
 *.pem
