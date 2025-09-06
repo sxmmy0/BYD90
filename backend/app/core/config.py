@@ -21,17 +21,19 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "AI-powered athlete performance platform"
     
     # CORS Settings
-    BACKEND_CORS_ORIGINS: List[str] = []
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
-        if isinstance(v, str) and not v.startswith("["):
-            return [i.strip() for i in v.split(",")]
+    def assemble_cors_origins(cls, v: Union[str, List[str], None]) -> List[str]:
+        if v is None:
+            return ["http://localhost:3000", "http://127.0.0.1:3000"]
+        if isinstance(v, str) and v.strip():
+            if not v.startswith("["):
+                return [i.strip() for i in v.split(",") if i.strip()]
+            return [v]
         elif isinstance(v, list):
             return v
-        elif isinstance(v, str):
-            return [v]
-        return []
+        return ["http://localhost:3000", "http://127.0.0.1:3000"]
 
     # Database Settings
     POSTGRES_SERVER: str = "localhost"

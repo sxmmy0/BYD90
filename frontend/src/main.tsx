@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import { HelmetProvider } from 'react-helmet-async'
 
 import App from './App.tsx'
-import { AuthProvider } from './store/auth.store.ts'
+import { AuthProvider } from './store/auth.store'
 import './styles/index.scss'
 
 // Create a client for React Query
