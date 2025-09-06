@@ -4,7 +4,7 @@ Core configuration settings for BYD90 Backend
 import secrets
 from typing import Any, Dict, List, Optional, Union
 
-from pydantic import AnyHttpUrl, EmailStr, HttpUrl, PostgresDsn, validator
+from pydantic import EmailStr, HttpUrl, PostgresDsn, validator
 from pydantic_settings import BaseSettings
 
 
@@ -21,15 +21,17 @@ class Settings(BaseSettings):
     DESCRIPTION: str = "AI-powered athlete performance platform"
     
     # CORS Settings
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: List[str] = []
 
     @validator("BACKEND_CORS_ORIGINS", pre=True)
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
+    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
-        elif isinstance(v, (list, str)):
+        elif isinstance(v, list):
             return v
-        raise ValueError(v)
+        elif isinstance(v, str):
+            return [v]
+        return []
 
     # Database Settings
     POSTGRES_SERVER: str = "localhost"
