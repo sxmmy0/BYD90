@@ -1,16 +1,16 @@
 """
 Database models for BYD90
 """
-from .user import User, UserType
 from .athlete import Athlete, AthletePosition, Sport
-from .coach import Coach
-from .recommendation import Recommendation, RecommendationType
 from .avatar import Avatar, AvatarCustomization
-from .community import Community, CommunityMember, Post, Comment
+from .coach import Coach
+from .community import Comment, Community, CommunityMember, Post
+from .recommendation import Recommendation, RecommendationType
+from .user import User, UserType
 
 __all__ = [
     "User",
-    "UserType", 
+    "UserType",
     "Athlete",
     "AthletePosition",
     "Sport",

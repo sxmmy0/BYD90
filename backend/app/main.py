@@ -2,15 +2,15 @@
 BYD90 FastAPI Main Application
 AI-powered athlete performance platform
 """
+import time
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-import time
 
-from app.core.config import settings
 from app.api.api_v1.api import api_router
-
+from app.core.config import settings
 
 # Create FastAPI app
 app = FastAPI(
@@ -26,11 +26,14 @@ app = FastAPI(
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origins=[
+            str(origin) for origin in settings.BACKEND_CORS_ORIGINS
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
 
 # Add request timing middleware
 @app.middleware("http")
@@ -42,6 +45,7 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
+
 # Add global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -52,8 +56,9 @@ async def global_exception_handler(request: Request, exc: Exception):
             "detail": "Internal server error",
             "message": "An unexpected error occurred. Please try again later.",
             "path": str(request.url.path),
-        }
+        },
     )
+
 
 # Health check endpoint
 @app.get("/health")
@@ -63,8 +68,9 @@ async def health_check():
         "status": "healthy",
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
-        "timestamp": time.time()
+        "timestamp": time.time(),
     }
+
 
 # Root endpoint
 @app.get("/")
@@ -78,6 +84,7 @@ async def root():
         "api_version": settings.API_V1_STR,
     }
 
+
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
 
@@ -86,10 +93,11 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
         port=8000,
         reload=True,
-        log_level="info"
+        log_level="info",
     )

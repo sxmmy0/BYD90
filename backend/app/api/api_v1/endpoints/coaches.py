@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 # Coach endpoints will be implemented here
 @router.get("/")
 def get_coaches():

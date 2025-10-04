@@ -5,6 +5,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
+
 # Athlete endpoints will be implemented here
 @router.get("/")
 def get_athletes():

@@ -4,14 +4,13 @@ FastAPI dependencies for authentication and database access
 from typing import Generator, Optional
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
 from app.core.security import verify_token
 from app.models.user import User
 from app.services.user_service import get_user_by_id
-
 
 # Security scheme
 security = HTTPBearer()
@@ -30,7 +29,7 @@ def get_db() -> Generator:
 
 async def get_current_user(
     db: Session = Depends(get_db),
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+    credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> User:
     """
     Get the current authenticated user from JWT token
@@ -40,23 +39,23 @@ async def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         # Extract token from credentials
         token = credentials.credentials
-        
+
         # Verify token and get user ID
         user_id = verify_token(token)
         if user_id is None:
             raise credentials_exception
-        
+
         # Get user from database
         user = get_user_by_id(db, user_id=int(user_id))
         if user is None:
             raise credentials_exception
-        
+
         return user
-        
+
     except Exception:
         raise credentials_exception
 
@@ -69,8 +68,7 @@ def get_current_active_user(
     """
     if not current_user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            detail="Inactive user"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
     return current_user
 
@@ -84,7 +82,7 @@ def get_current_athlete(
     if current_user.user_type != "athlete":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access restricted to athletes only"
+            detail="Access restricted to athletes only",
         )
     return current_user
 
@@ -98,7 +96,7 @@ def get_current_coach(
     if current_user.user_type != "coach":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access restricted to coaches only"
+            detail="Access restricted to coaches only",
         )
     return current_user
 
@@ -112,7 +110,7 @@ def get_current_admin(
     if current_user.user_type != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access restricted to administrators only"
+            detail="Access restricted to administrators only",
         )
     return current_user
 
@@ -126,14 +124,14 @@ def get_current_verified_user(
     if not current_user.is_verified:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email verification required"
+            detail="Email verification required",
         )
     return current_user
 
 
 def get_optional_current_user(
     db: Session = Depends(get_db),
-    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
 ) -> Optional[User]:
     """
     Get the current user if authenticated, otherwise return None
@@ -141,15 +139,15 @@ def get_optional_current_user(
     """
     if not credentials:
         return None
-    
+
     try:
         token = credentials.credentials
         user_id = verify_token(token)
         if user_id is None:
             return None
-        
+
         user = get_user_by_id(db, user_id=int(user_id))
         return user
-        
+
     except Exception:
         return None
