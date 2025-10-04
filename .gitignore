@@ -349,3 +349,9 @@ alembic.ini
 # Local development files
 local_settings.py
 development.py
+
+# Personal Development Documents (Private - Holiday Learning Materials)
+docs/7-DAY-HOLIDAY-DEVELOPMENT-ROADMAP.md
+docs/PYTHON-REFRESHER-COURSE.md
+docs/GRAPHQL-LEARNING-GUIDE.md
+docs/PYTHON-PRACTICE-EXERCISES.md
